@@ -4,10 +4,12 @@ from bs4 import BeautifulSoup
 import re
 import operator
 
+
 class Subway:
     def __init__(self):
         self.stores = []        # 모든 매장 정보를 담을 리스트
         self.all_address = {}   # 모든 매장 주소를 담을 딕셔너리
+        self.add1_sorted_list = {}      # 시/도의 매장 개수 정보를 정렬해서 저장할 리스트
 
     def put_store(self, a):
         # a는 ['339', '부산반여점', '부산광역시 해운대구 선수촌로 78', '아침메뉴\n딜리버리', '051-783-6384', ''] 구조로 되어있음
@@ -47,12 +49,15 @@ class Subway:
         address_list = a[2].split()     # 주소 문자열을 split하여 리스트로 변환
         if address_list[0] in self.all_address.keys():      # all_address 안에 주소 정보를 넣어준다(key는 도/시, value는 시/군/구)
             self.all_address[address_list[0]].add(address_list[1])
+            self.add1_sorted_list[address_list[0]] += 1
         else:
             self.all_address[address_list[0]] = {address_list[1]}
+            self.add1_sorted_list[address_list[0]] = 1
 
         store_dict = {'name': a[1], 'address': a[2], 'add1': address_list[0], 'add2': address_list[1], 'tel': a[4]}
 
         self.stores.append(store_dict)      # 각 매장 정보를 stores 리스트 안에 딕셔너리로 저장한다
+
 
     def search_add1(self):      # 시/도 정보를 입력받아서 조회해주는 함수
         while 1:
@@ -116,16 +121,15 @@ class Subway:
                 break
 
     def sort(self):     # 써브웨이 지역별 매장 개수를 프린팅하는 함수. 매장이 많은 지역부터 프린팅
-        add1_dict = {}       # add1의 개수 정보를 저장할 딕셔너리
-        add1_sorted_list = []       # add1의 개수 정보를 정렬해서 저장할 리스트
+        count = 0
 
-        for a in self.all_address.keys():
-            add1_dict[a] = len(self.all_address[a])     # all_address를 이용해 add1 요소별 개수 세기
+        self.add1_sorted_list = sorted(self.add1_sorted_list.items(), key=operator.itemgetter(1), reverse=True)      # add1_dict의 value를 내림차순으로 정렬하여 add1_sorted_list에 저장
 
-        add1_sorted_list = sorted(add1_dict.items(), key=operator.itemgetter(1), reverse=True)      # add1_dict의 value를 내림차순으로 정렬하여 add1_sorted_list에 저장
-
-        for e in add1_sorted_list:
+        for e in self.add1_sorted_list:
             print(e[0], '\t', e[1], '개')
+            count += e[1]
+
+        print('=> 전국 총', count, '개 매장이 있습니다.')
 
 
 def scrap(subway):
