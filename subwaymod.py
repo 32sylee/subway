@@ -129,7 +129,7 @@ class Subway:
 
 
 def scrap(subway):
-    for url_num in range(1, 35):  # 전체 페이지 긁어오기(1~35페이지)
+    for url_num in range(1, 36):  # 전체 페이지 긁어오기(1~35페이지)
         url = 'http://subway.co.kr/storeSearch?page=' + str(url_num)
         result = requests.get(url)
         soup = BeautifulSoup(result.text, 'html.parser')
